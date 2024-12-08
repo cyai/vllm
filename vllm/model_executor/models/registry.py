@@ -199,7 +199,7 @@ _VLLM_MODELS = {
     **_SPECULATIVE_DECODING_MODELS,
 }
 
-_VLLM_MODELS["katanemo/Arch-Function-1.5B"] = Qwen2ForCausalLM
+_VLLM_MODELS["katanemo/Arch-Function-1.5B"] = ("qwen2", "Qwen2ForCausalLM")
 
 
 # Models not supported by ROCm.

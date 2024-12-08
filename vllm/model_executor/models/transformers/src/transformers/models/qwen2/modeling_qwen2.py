@@ -51,8 +51,8 @@ from ...utils import (
 )
 from .configuration_qwen2 import Qwen2Config
 
-from vllm.attention import Attention
-from vllm.config import VllmConfig
+# from vllm.attention import Attention
+# from vllm.config import VllmConfig
 # from vllm.model_executor.parallel_utils import RowParallelLinear, ColumnParallelLinear
 
 
@@ -268,10 +268,10 @@ class Qwen2Attention(nn.Module):
     """
 
     def __init__(
-        self, config: VllmConfig, prefix: str, layer_idx: Optional[int] = None
+        self, config: any, prefix: str, layer_idx: Optional[int] = None
     ):
         super().__init__()
-        self.attn = Attention(f"{prefix}.attn")
+        # self.attn = Attention(f"{prefix}.attn")
         self.config = config
         self.layer_idx = layer_idx
         if layer_idx is None:
@@ -638,7 +638,7 @@ QWEN2_ATTENTION_CLASSES = {
 
 
 class Qwen2DecoderLayer(nn.Module):
-    def __init__(self, config: VllmConfig, prefix: str, layer_idx: int):
+    def __init__(self, config: any, prefix: str, layer_idx: int):
         super().__init__()
         self.hidden_size = config.hidden_size
         self.self_attn = Qwen2Attention(config, prefix=f"{prefix}.self_attn")
@@ -866,7 +866,7 @@ class Qwen2Model(Qwen2PreTrainedModel):
         config: Qwen2Config
     """
 
-    def __init__(self, config: VllmConfig, prefix: str):
+    def __init__(self, config: any, prefix: str):
         super().__init__(config)
         self.padding_idx = config.pad_token_id
         self.vocab_size = config.vocab_size
@@ -1241,7 +1241,7 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel, GenerationMixin):
         input_ids: torch.Tensor,
         positions: torch.Tensor,
         kv_caches: Optional[List[torch.Tensor]] = None,
-        attn_metadata: Optional[AttentionMetadata] = None,
+        attn_metadata: Optional[any] = None,
     ) -> torch.Tensor:
         """
         Forward pass for vLLM-compatible QwenForCausalLM.
@@ -1255,7 +1255,6 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel, GenerationMixin):
         Returns:
             `torch.Tensor`: Logits of shape `(total_tokens, vocab_size)`.
         """
-        # Pass inputs through the base model
         outputs = self.model(
             input_ids=input_ids,
             positions=positions,
@@ -1263,10 +1262,8 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel, GenerationMixin):
             attn_metadata=attn_metadata,
         )
 
-        # Extract hidden states (the output from the last layer)
         hidden_states = outputs[0]
 
-        # Compute logits for all tokens
         logits = self.lm_head(hidden_states)
 
         return logits
